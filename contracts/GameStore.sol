@@ -37,6 +37,11 @@ contract GameStore is Ownable {
         battlePassPrice[_season] = _price;
     }
 
+    function GetBattlePassPrice(uint256 _season) public view returns(uint256) {
+        return battlePassPrice[_season];
+    }
+
+    // note: msg.sender must have approved GameStore contract to spend GBUX first
     function PurchaseBattlePass(uint256 _season) public {
         GameProfile gameProfile = GameProfile(gameProfileContract);
         require(gameProfile.HasGameProfile(msg.sender) == true, "Account doesn't have a Game Profile"); 
@@ -45,7 +50,7 @@ contract GameStore is Ownable {
         uint256 cost = battlePassPrice[_season];
         require(IERC20(ghordeBucksContract).balanceOf(msg.sender) >= cost, "Insufficient GhordeBucks"); 
         ERC20Burnable ghordeBucks = ERC20Burnable(ghordeBucksContract);
-        ghordeBucks.burn(cost);
+        ghordeBucks.burnFrom(msg.sender, cost);
 
         uint256 tokenId = gameProfile.GetOwnersGameProfileTokenID(msg.sender);
         battlePassOwned[tokenId][_season] = true;

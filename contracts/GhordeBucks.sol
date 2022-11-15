@@ -30,17 +30,18 @@ contract GhordeBucks is ERC20, ERC20Burnable, Ownable {
         tokenMintRate[GHST_TOKEN_ADDRESS] = GHST_GBUX_MULTIPLIER;
     }
 
-    function BuyMint(address to, address token, uint256 amount) public {
+    // note: msg.sender must have approved GhordeBucks contract to spend DAI/GHST first
+    function BuyMint(address token, uint256 amount) public {
         require(amount > 0, "Amount Cannot Be 0"); 
         require(tokenMintRate[token] > 0, "Token Cannot Mint GBUX"); 
 
-        require(IERC20(token).balanceOf(to) >= amount, "Insufficient Funds");
+        require(IERC20(token).balanceOf(msg.sender) >= amount, "Insufficient Funds");
 
-        uint256 allowance = IERC20(token).allowance(to, address(this));
+        uint256 allowance = IERC20(token).allowance(msg.sender, address(this));
         require(allowance >= amount, "Check the Token Allowance");
 
-        IERC20(token).transferFrom(to, address(this), amount);
-        _mint(to, (amount / 100) * tokenMintRate[token]);
+        IERC20(token).transferFrom(msg.sender, address(this), amount);
+        _mint(msg.sender, (amount / 100) * tokenMintRate[token]);
     }
 
     // function QuestMint(address to, uint256 questID) public {

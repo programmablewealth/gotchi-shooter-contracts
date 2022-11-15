@@ -14,7 +14,7 @@ module.exports = {
   networks: {
     polygon: {
       url: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      gasPrice: 80 * 1000000000,
+      gasPrice: 60 * 1000000000,
       chainId: 137,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY]
     },
