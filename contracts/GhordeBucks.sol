@@ -7,12 +7,12 @@ import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 /**
  * Can be Minted:
- * - with DAI or GHST for bonus tokens
- * - by completing season quests
+ * - with DAI or GHST for 10% bonus tokens      [done]
+ * - by completing season quests                [todo]
  * 
  * Can be used for:
- * - Unlocking Battle Pass
- * - Buying items from the in-game store
+ * - Unlocking Battle Pass                      [todo]
+ * - Buying items from the in-game store        [todo]
  */
 contract GhordeBucks is ERC20, ERC20Burnable, Ownable {
     mapping (address => uint256) tokenMintRate;
@@ -43,11 +43,11 @@ contract GhordeBucks is ERC20, ERC20Burnable, Ownable {
         _mint(to, (amount / 100) * tokenMintRate[token]);
     }
 
-    function QuestMint(address to, uint256 questID) public {
-        require(questReward[questID] > 0, "Quest must have reward"); 
-        require(userQuestRedeemed[to][questID] == false, "Quest reward already redeemed"); 
-        _mint(to, questReward[questID]); 
-    }
+    // function QuestMint(address to, uint256 questID) public {
+    //     require(questReward[questID] > 0, "Quest must have reward"); 
+    //     require(userQuestRedeemed[to][questID] == false, "Quest reward already redeemed"); 
+    //     _mint(to, questReward[questID]); 
+    // }
 
     function SetTokenMintRate(address token, uint256 amount) public onlyOwner {
         tokenMintRate[token] = amount;
