@@ -8,9 +8,10 @@ import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
 import './GameProfile.sol';
 
 /**
- * Purchase a Battle Pass with GBUX                 [done]
- * GBUX is burned during Purchase                   [done]
- * Battle Pass is associated with Game Profile      [done]
+ * Purchase a Battle Pass with GBUX                                                         [done]
+ * GBUX is burned during Purchase                                                           [done]
+ * Battle Pass is associated with Game Profile                                              [done]
+ * Implement a cut of sales going to player rewards pool, gamedev fund, and aavegotchi dao  [todo]
  */
 
 contract GameStore is Ownable {
