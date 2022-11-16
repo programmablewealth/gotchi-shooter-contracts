@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
  * GameProfile tracks XP across many gotchis               [done]
  * Max of 1 GameProfile per account (even if burned)       [done]
  * Unique name                                             [done]
- * GameProfile can sign up for battlepass                  [todo]
+ * GameProfile can sign up for battlepass                  [done]
  **/
 
  contract GameProfile is ERC721, ERC721Burnable, Ownable {
@@ -42,7 +42,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
         ownersProfileTokenId[msg.sender] = tokenId;
     }
 
-    function ClaimXP(address owner, uint256 season, uint256 xp) public onlyOwner {
+    function IssueXP(address owner, uint256 season, uint256 xp) public onlyOwner {
         uint256 tokenId = ownersProfileTokenId[owner];
         
         // update profile XP
