@@ -46,6 +46,8 @@ contract GameStore is Ownable {
 
     // note: msg.sender must have approved GameStore contract to spend GBUX first
     function PurchaseBattlePass(uint256 _season) public {
+        require(battlePassPrice[_season] > 0, "Battle Pass Has No Price"); 
+
         GameProfile gameProfile = GameProfile(gameProfileContract);
         require(gameProfile.HasGameProfile(msg.sender) == true, "Account doesn't have a Game Profile"); 
         require(HasBattlePass(msg.sender, _season) == false, "Account already has a Battle Pass"); 

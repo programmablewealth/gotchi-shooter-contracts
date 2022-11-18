@@ -12,7 +12,12 @@ Process:
 
 Get DAI or GHST to buy GBUX
 Approve the GBUX contract to spend your DAI/GHST (using the DAI/GHST contract approve function)
+    - GHST : https://polygonscan.com/address/0x385eeac5cb85a38a9a07a70c73e0a3271cfb54a7#writeProxyContract
+    - DAI : https://polygonscan.com/address/0x8f3cf7ad23cd3cadbd9735aff958023239c6a063#writeProxyContract
+    - WEI to ETH converter : https://eth-converter.com/
 Mint GBUX with your DAI/GHST (using GBUX contract BuyMint function)
 Mint a Game Profile (using GameProfile contract MintProfile function)
 Approve the GameStore contract to spend your GBUX (using GBUX contract approve function)
 Purchase the Battle Pass (using GameStore contract PurchaseBattlePass function)
+// todo earn xp on profile
+Claim BattlePass rewards (using BattlePass contract ClaimReward function)
