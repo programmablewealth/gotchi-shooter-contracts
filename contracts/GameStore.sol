@@ -25,7 +25,7 @@ contract GameStore is Ownable {
     constructor(address _ghordeBucksContract, address _gameProfileContract) {
         ghordeBucksContract = _ghordeBucksContract;
         gameProfileContract = _gameProfileContract;
-        battlePassPrice[0] = 1 ether;
+        battlePassPrice[0] = 5 ether;
     }
 
     function SetGhordeBucksContract(address _ghordeBucksContract) public onlyOwner {

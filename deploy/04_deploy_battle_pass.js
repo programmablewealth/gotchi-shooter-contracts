@@ -7,10 +7,12 @@ module.exports = async ({ethers, getNamedAccounts, deployments}) => {
     const GhordeBucksContract = await ethers.getContract("GhordeBucks");
 
     const GameItemsContract = await ethers.getContract("GameItems", deployer);
+    const GameStoreContract = await ethers.getContract("GameStore", deployer);
+    const GameProfileContract = await ethers.getContract("GameProfile", deployer);
 
     await deploy('BattlePass', {
       from: deployer,
-      args: [GhordeBucksContract.address, GameItemsContract.address],
+      args: [GhordeBucksContract.address, GameItemsContract.address, GameProfileContract.address],
       log: true,
     });
 
@@ -19,7 +21,7 @@ module.exports = async ({ethers, getNamedAccounts, deployments}) => {
 
     await GameItemsContract.SetBattlePassAddress(BattlePassContract.address).then(
       (tx) => {
-        console.log(`Calling SetBattlePassAddress on "Game Items" contract (tx: ${tx})`);
+        console.log(`Calling SetBattlePassAddress on "GameItems" contract (tx: ${tx})`);
         tx.wait()
       }
     );
@@ -34,6 +36,34 @@ module.exports = async ({ethers, getNamedAccounts, deployments}) => {
     await BattlePassContract.AddBattlePassRewards(0).then(
       (tx) => {
         console.log(`Calling AddBattlePassRewards on "BattlePassContract" contract (tx: ${tx})`);
+        tx.wait()
+      }
+    );
+
+    await GhordeBucksContract.SetBattlePassAddress(BattlePassContract.address).then(
+      (tx) => {
+        console.log(`Calling SetBattlePassAddress on "GhordeBucksContract" contract (tx: ${tx})`);
+        tx.wait()
+      }
+    );
+
+    await GhordeBucksContract.SetGameStoreAddress(GameStoreContract.address).then(
+      (tx) => {
+        console.log(`Calling SetGameStoreAddress on "GhordeBucksContract" contract (tx: ${tx})`);
+        tx.wait()
+      }
+    );
+
+    await GameProfileContract.SetBattlePassAddress(BattlePassContract.address).then(
+      (tx) => {
+        console.log(`Calling SetBattlePassAddress on "GameProfileContract" contract (tx: ${tx})`);
+        tx.wait()
+      }
+    );
+
+    await GameProfileContract.SetGameStoreAddress(GameStoreContract.address).then(
+      (tx) => {
+        console.log(`Calling SetGameStoreAddress on "GameProfileContract" contract (tx: ${tx})`);
         tx.wait()
       }
     );

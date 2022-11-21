@@ -6,6 +6,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import '@openzeppelin/contracts/access/Ownable.sol';
 import "@openzeppelin/contracts/utils/Counters.sol";
 
+import './BattlePass.sol';
+import './GameStore.sol';
+
 /**
  * erc721 token                                            [done]
  * soulbound                                               [done]
@@ -21,29 +24,63 @@ import "@openzeppelin/contracts/utils/Counters.sol";
     Counters.Counter private _tokenIdCounter;
 
     mapping (address => bool) profilesOwned;                            // account => profile owned
+    mapping (uint256 => string) profileName;                            // profile token id => profile name
     mapping (string => bool) nameInUse;                                 // profile name => is name in use
     mapping (uint256 => uint256) profileXP;                             // profile token id => profile XP
     mapping (uint256 => mapping(uint256 => uint256)) seasonXP;          // profile token id => season # => season XP
     mapping (address => uint256) ownersProfileTokenId;                  // account => profile token ID
 
+    address battlePassAddress;
+    address gameStoreAddress;
+
+    struct GameProfileInfo {
+        uint256 tokenId;
+        string name;
+        uint256 profileXP;
+        uint256[] seasonXPs;
+        bool[] battlePasses;
+    }
+
     constructor() ERC721("GhordeProfile", "GPROF") {
     }
 
-    function MintProfile(string calldata profileName) public {
+    function SetBattlePassAddress(address _battlePassAddress) public onlyOwner {
+        battlePassAddress = _battlePassAddress;
+    }
+
+    function SetGameStoreAddress(address _gameStoreAddress) public onlyOwner {
+        gameStoreAddress = _gameStoreAddress;
+    }
+
+    function MintProfile(string calldata _profileName) public {
         require(profilesOwned[msg.sender] == false, "You already have or had a profile");
-        require(nameInUse[profileName] == false, "Profile name already exists");
+        require(nameInUse[_profileName] == false, "Profile name already exists");
 
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
 
         profilesOwned[msg.sender] = true;
-        nameInUse[profileName] = true;
+        nameInUse[_profileName] = true;
         ownersProfileTokenId[msg.sender] = tokenId;
+        profileName[tokenId] = _profileName;
     }
 
     function IssueXP(address owner, uint256 season, uint256 xp) public onlyOwner {
         uint256 tokenId = ownersProfileTokenId[owner];
+        
+        // update profile XP
+        profileXP[tokenId] += xp;
+
+        // update season XP
+        seasonXP[tokenId][season] += xp;
+    }
+
+    // used for testing, user can self claim XP without game verifying it is legitimate
+    function ClaimXP(uint256 season, uint256 xp) public {
+        require(profilesOwned[msg.sender] == true, "You must have a GameProfile to claim XP");
+
+        uint256 tokenId = ownersProfileTokenId[msg.sender];
         
         // update profile XP
         profileXP[tokenId] += xp;
@@ -72,5 +109,39 @@ import "@openzeppelin/contracts/utils/Counters.sol";
     // important: Check HasGameProfile first, because it will return tokenId = 0 if there is no game profile
     function GetOwnersGameProfileTokenID(address _account) public view returns(uint256) {
         return ownersProfileTokenId[_account];
+    }
+
+    function AccountSeasonXP(address _account, uint256 _season) public view returns(uint256) {
+        require(HasGameProfile(_account) == true, "Account has no Game Profile");
+        uint256 tokenId = GetOwnersGameProfileTokenID(_account);
+        return seasonXP[tokenId][_season];
+    }
+
+    function GetGameProfileInfo(address _account) public view returns(GameProfileInfo memory) {
+        require(HasGameProfile(_account) == true, "Account has no Game Profile");
+        require(battlePassAddress != address(0), "Battle Pass address not set");
+        require(gameStoreAddress != address(0), "Game Store address not set");
+
+        uint256 tokenId = GetOwnersGameProfileTokenID(_account);
+        uint256 seasons = BattlePass(battlePassAddress).GetSeasonCount();
+        uint256[] memory seasonXPs = new uint256[](seasons);
+        for (uint256 i = 0; i < seasons; i++) {
+            seasonXPs[i] = seasonXP[tokenId][i];
+        }
+
+        bool[] memory battlePasses = new bool[](seasons);
+        for (uint256 i = 0; i < seasons; i++) {
+            battlePasses[i] = GameStore(gameStoreAddress).HasBattlePass(_account, i);
+        }
+
+        GameProfileInfo memory gameProfileInfo = GameProfileInfo(
+            tokenId,
+            profileName[tokenId],
+            profileXP[tokenId],
+            seasonXPs,
+            battlePasses
+        );
+
+        return gameProfileInfo;
     }
  }

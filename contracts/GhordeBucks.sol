@@ -5,6 +5,9 @@ import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
+import './BattlePass.sol';
+import './GameStore.sol';
+
 /**
  * Can be Minted:
  * - with DAI or GHST for 10% bonus tokens      [done]
@@ -16,8 +19,8 @@ import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
  */
 contract GhordeBucks is ERC20, ERC20Burnable, Ownable {
     mapping (address => uint256) tokenMintRate;
-    mapping (uint256 => uint256) questReward;
-    mapping (address => mapping (uint256 => bool)) userQuestRedeemed;
+    // mapping (uint256 => uint256) questReward;
+    // mapping (address => mapping (uint256 => bool)) userQuestRedeemed;
 
     address DAI_TOKEN_ADDRESS = 0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063;
     address GHST_TOKEN_ADDRESS = 0x385Eeac5cB85A38A9a07A70c73e0a3271CfB54A7;
@@ -25,9 +28,20 @@ contract GhordeBucks is ERC20, ERC20Burnable, Ownable {
     uint256 BASE_GBUX_RATE = 100;
     uint256 GHST_GBUX_MULTIPLIER = 110;
 
+    address battlePassAddress = address(0);
+    address gameStoreAddress = address(0);
+
     constructor() ERC20("GhordeBucks", "GBUX") {
         tokenMintRate[DAI_TOKEN_ADDRESS] = BASE_GBUX_RATE;
         tokenMintRate[GHST_TOKEN_ADDRESS] = GHST_GBUX_MULTIPLIER;
+    }
+
+    function SetBattlePassAddress(address _battlePassAddress) public onlyOwner {
+        battlePassAddress = _battlePassAddress;
+    }
+
+    function SetGameStoreAddress(address _gameStoreAddress) public onlyOwner {
+        gameStoreAddress = _gameStoreAddress;
     }
 
     // note: msg.sender must have approved GhordeBucks contract to spend DAI/GHST first
@@ -49,6 +63,21 @@ contract GhordeBucks is ERC20, ERC20Burnable, Ownable {
     //     require(userQuestRedeemed[to][questID] == false, "Quest reward already redeemed"); 
     //     _mint(to, questReward[questID]); 
     // }
+
+    function BattlePassMint(
+        address player,
+        uint256 season,
+        uint256 level,
+        uint256[] memory amounts
+    ) public {
+        require(battlePassAddress != address(0), "Battle Pass Address Must Be Set");
+        require(BattlePass(battlePassAddress).SeasonExists(season) == true, "Battle Pass Season Doesn't Exist");
+        require(GameStore(gameStoreAddress).HasBattlePass(player, season), "Player Doesn't Have Battle Pass");
+        require(BattlePass(battlePassAddress).RewardClaimed(season, player, level) == false, "Reward Already Claimed");
+        require(BattlePass(battlePassAddress).LevelRequirementMeet(player, season, level) == true, "Insufficient Season XP");
+
+        _mint(player, amounts[0]); 
+    }
 
     function SetTokenMintRate(address token, uint256 amount) public onlyOwner {
         tokenMintRate[token] = amount;

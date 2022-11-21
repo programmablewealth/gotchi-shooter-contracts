@@ -13,10 +13,16 @@ contract GameItems is ERC1155, Ownable {
         bool isConsumable;
     }
 
+    struct ItemBalance {
+        string itemName;
+        bool isConsumable;
+        uint256 quantity;
+    }
+
     Item[] items;
 
-    address gameStoreAddress;
-    address battlePassAddress;
+    address gameStoreAddress = address(0);
+    address battlePassAddress = address(0);
 
     constructor(address _gameStoreAddress) ERC1155("https://game.example/api/item/{id}.json") {
         items.push(Item("Health Potion", true));
@@ -38,6 +44,20 @@ contract GameItems is ERC1155, Ownable {
         return items[_tokenId];
     }
 
+    function GetItemsBalances(address _account) public view returns(ItemBalance[] memory) {
+        ItemBalance[] memory itemBalances = new ItemBalance[](items.length);
+
+        for (uint256 i = 0; i < items.length; i++) {
+            itemBalances[i] = ItemBalance(
+                items[i].itemName,
+                items[i].isConsumable,
+                balanceOf(_account, i)
+            );
+        }
+
+        return itemBalances;
+    }
+
     function MintItems(
         address player,
         uint256 season,
@@ -50,6 +70,7 @@ contract GameItems is ERC1155, Ownable {
         require(BattlePass(battlePassAddress).SeasonExists(season) == true, "Battle Pass Season Doesn't Exist");
         require(GameStore(gameStoreAddress).HasBattlePass(player, season), "Player Doesn't Have Battle Pass");
         require(BattlePass(battlePassAddress).RewardClaimed(season, player, level) == false, "Reward Already Claimed");
+        require(BattlePass(battlePassAddress).LevelRequirementMeet(player, season, level) == true, "Insufficient Season XP");
 
         _mintBatch(player, ids, amounts, data);
     }
