@@ -1,23 +1,53 @@
-User Journey
+# Gotchi Horde Game Smart Contracts
 
-Go to GotchHorde.com
-Login to the game via Metamask using Chainsafe SDK
-Select register a GameProfile
-Enter a profile nick name, select button to mint the soulbound ERC721 (maximum of 1 per account)
-Nickname must be unique can pay a once off fee to get this changed later
-On your Game Profile, see the prizes up for grabs for those with a battlepass, select from two options to mint a battlepass, one for stables or one for ghst (at a discount)
-Via Season Quests available against your Game Profile, turn them in when you have completed them for an season based ERC20 to level up season progress in GameProfile
+## Introduction
 
-Process:
+This repo contains the smart contracts used in [Gotchi Horde](https://gotchihorde.com) a multiplayer shoot 'em up game, currently under development, that makes use of Aavegotchi ecosystem assets.
 
-Get DAI or GHST to buy GBUX
-Approve the GBUX contract to spend your DAI/GHST (using the DAI/GHST contract approve function)
-    - GHST : https://polygonscan.com/address/0x385eeac5cb85a38a9a07a70c73e0a3271cfb54a7#writeProxyContract
-    - DAI : https://polygonscan.com/address/0x8f3cf7ad23cd3cadbd9735aff958023239c6a063#writeProxyContract
-    - WEI to ETH converter : https://eth-converter.com/
-Mint GBUX with your DAI/GHST (using GBUX contract BuyMint function)
-Mint a Game Profile (using GameProfile contract MintProfile function)
-Approve the GameStore contract to spend your GBUX (using GBUX contract approve function)
-Purchase the Battle Pass (using GameStore contract PurchaseBattlePass function)
-// todo earn xp on profile
-Claim BattlePass rewards (using BattlePass contract ClaimReward function)
+## Smart Contracts
+
+### GotchiHorde Bucks (GBUX)
+
+GBUX is an ERC20 built specifically for this game.
+
+GBUX can be minted using DAI or GHST. To incentivise the use of GHST, when minting with GHST you will receive a notably higher amount of GBUX per USD value of GHST vs. DAI.
+
+These funds will be set aside to fund additional game development and content.
+
+Some may be used for player rewards and as a commission to the Aavegotchi DAO.
+
+GBUX is used in the Game Store and for purchasing the Battle Pass that allows that player to mint ERC20s, ERC1155s, and ERC721s in the Battle Pass as they level up their Battle Pass through gameplay.
+
+### Game Profile
+
+Accounts require a Game Profile to collect XP and acquire a Battle Pass.
+
+A Game Profile is a soulbound (i.e. non-transferable) NFT, specifically it is an ERC721.
+
+A Game Profile must have a unique nick name, and there is a maximum of one that can be held per account.
+
+XP dropped to a player's account on-chain, as a reward for completing gameplay.
+
+The mechanism for this is still under development but will likely involve off-chain storage of matches completed by the player that is batch dropped on-chain by an XP manager contract that has the access to update the player's XP on-chain.
+
+### Game Store
+
+Players will be able to purchase in-game items and a seasonal Battle Pass from the Game Store smart contract using GBUX.
+
+### Game Items
+
+The game will feature a number of ERC1155s that can be used in-game.
+
+These items get minted when claimed through a Battle Pass reward or when they are purchased via the Game Store.
+
+These items get burned when they are consumed in-game.
+
+### Battle Pass
+
+The seasonal Battle Pass can be purchased with GBUX and will feature different rewards per level.
+
+Once the XP requirements are meet for each level, rewards can be claimed via the Battle Pass, and they will be minted on-chain and transferred to the Battle Pass owner.
+
+### Raffles
+
+Support for raffles will be added in the future. The Battle Pass will contain some raffle tickets as rewards that can be entered into a raffle managed by Chainlink VRF to win various Aavegotchi NFTs.
