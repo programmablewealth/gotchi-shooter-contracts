@@ -26,7 +26,7 @@ A Game Profile is a soulbound (i.e. non-transferable) NFT, specifically it is an
 
 A Game Profile must have a unique nick name, and there is a maximum of one that can be held per account.
 
-XP dropped to a player's account on-chain, as a reward for completing gameplay.
+XP is dropped to a player's Game Profile on-chain, as a reward for completing gameplay.
 
 The mechanism for this is still under development but will likely involve off-chain storage of matches completed by the player that is batch dropped on-chain by an XP manager contract that has the access to update the player's XP on-chain.
 
